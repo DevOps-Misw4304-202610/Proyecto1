@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user_blacklist
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: blacklist_db
+    ports:
+      - "5417:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
