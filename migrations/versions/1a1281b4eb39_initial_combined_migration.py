@@ -1,8 +1,8 @@
-"""Initial migration
+"""Initial combined migration
 
-Revision ID: e5676702c599
+Revision ID: 1a1281b4eb39
 Revises: 
-Create Date: 2026-04-08 14:44:46.072327
+Create Date: 2026-04-10 00:59:20.142648
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e5676702c599'
+revision = '1a1281b4eb39'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,7 +28,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('blacklist', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_blacklist_email'), ['email'], unique=False)
+        batch_op.create_index(batch_op.f('ix_blacklist_email'), ['email'], unique=True)
 
     # ### end Alembic commands ###
 

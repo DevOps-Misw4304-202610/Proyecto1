@@ -1,0 +1,90 @@
+{
+	"info": {
+		"name": "Blacklist API Robust Tests - Uniandes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Seguridad (Auth)",
+			"item": [
+				{
+					"name": "POST - Sin Token (401)",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 401', () => pm.response.to.have.status(401));"] } }],
+					"request": {
+						"method": "POST",
+						"url": "{{base_url}}/blacklists",
+						"body": { "mode": "raw", "raw": "{\"email\": \"fail@test.com\", \"app_uuid\": \"123\"}" }
+					}
+				},
+				{
+					"name": "POST - Token Inválido (422/401)",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Auth failed', () => pm.expect(pm.response.code).to.be.oneOf([401, 422]));"] } }],
+					"request": {
+						"method": "POST",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "token-falso-123", "type": "string" }] },
+						"url": "{{base_url}}/blacklists",
+						"body": { "mode": "raw", "raw": "{\"email\": \"fail@test.com\", \"app_uuid\": \"123\"}" }
+					}
+				}
+			]
+		},
+		{
+			"name": "Validación de Datos (400)",
+			"item": [
+				{
+					"name": "POST - Email Mal Formateado",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', () => pm.response.to.have.status(400));", "pm.test('Error message exists', () => pm.expect(pm.response.json().email[0]).to.contain('Formato'));"] } }],
+					"request": {
+						"method": "POST",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+						"body": { "mode": "raw", "raw": "{\"email\": \"not-an-email\", \"app_uuid\": \"123\"}", "options": { "raw": { "language": "json" } } },
+						"url": "{{base_url}}/blacklists"
+					}
+				},
+				{
+					"name": "POST - Faltan campos requeridos",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', () => pm.response.to.have.status(400));"] } }],
+					"request": {
+						"method": "POST",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+						"body": { "mode": "raw", "raw": "{\"email\": \"missing@test.com\"}", "options": { "raw": { "language": "json" } } },
+						"url": "{{base_url}}/blacklists"
+					}
+				}
+			]
+		},
+		{
+			"name": "Flujo Exitoso (Happy Path)",
+			"item": [
+				{
+					"name": "POST - Registro Exitoso",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 201', () => pm.response.to.have.status(201));", "pm.test('ID returned', () => pm.expect(pm.response.json()).to.have.property('id'));"] } }],
+					"request": {
+						"method": "POST",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+						"body": { "mode": "raw", "raw": "{\"email\": \"exito@uniandes.edu.co\", \"app_uuid\": \"550e8400-e29b-41d4-a716-446655440000\", \"blocked_reason\": \"Spam detectado\"}", "options": { "raw": { "language": "json" } } },
+						"url": "{{base_url}}/blacklists"
+					}
+				},
+				{
+					"name": "GET - Consultar Email Existente",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', () => pm.response.to.have.status(200));", "pm.test('Present is true', () => pm.expect(pm.response.json().present).to.be.true);"] } }],
+					"request": {
+						"method": "GET",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+						"url": "{{base_url}}/blacklists/exito@uniandes.edu.co"
+					}
+				},
+				{
+					"name": "GET - Consultar Email NO Existente",
+					"event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', () => pm.response.to.have.status(200));", "pm.test('Present is false', () => pm.expect(pm.response.json().present).to.be.false);"] } }],
+					"request": {
+						"method": "GET",
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }] },
+						"url": "{{base_url}}/blacklists/noexiste@test.com"
+					}
+				}
+			]
+		}
+	]
+}

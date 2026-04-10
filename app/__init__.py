@@ -12,9 +12,9 @@ ma = Marshmallow()
 jwt = JWTManager()
 migrate = Migrate()
 
-def create_app():
+def create_app(config_class=Config):
     application = Flask(__name__)
-    application.config.from_object(Config)
+    application.config.from_object(config_class)
 
     # 2. Inicializamos las extensiones con la app
     db.init_app(application)

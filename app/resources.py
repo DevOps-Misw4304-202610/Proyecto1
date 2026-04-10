@@ -4,6 +4,7 @@ from .models import db, Blacklist
 from flask_jwt_extended import jwt_required
 from .models import db, Blacklist
 from .schemas import BlacklistSchema
+from sqlalchemy.exc import IntegrityError
 
 # Instanciamos el schema para validar entradas
 blacklist_schema = BlacklistSchema()
@@ -13,39 +14,28 @@ class HealthCheck(Resource):
         return {"status": "UP"}, 200
 
 class BlacklistResource(Resource):
-
     @jwt_required()
     def get(self, email):
-        #verify_jwt_in_request()
-        
-        
-        blacklist_entry = Blacklist.query.filter_by(email=email).first()
+        # Consultamos siempre en minúsculas
+        blacklist_entry = Blacklist.query.filter_by(email=email.lower()).first()
         
         if blacklist_entry:
             return {
                 "present": True,
                 "blocked_reason": blacklist_entry.blocked_reason or ""
             }, 200
-        else:
-            return {
-                "present": False,
-                "blocked_reason": ""
-            }, 200
+        return {"present": False, "blocked_reason": ""}, 200
     
     @jwt_required()
     def post(self):
-
-        #verify_jwt_in_request()
         data = request.get_json()
-        
-        # Validar datos con Marshmallow
         errors = blacklist_schema.validate(data)
         if errors:
             return errors, 400
 
-        # Crear la entrada
+        # Normalizamos a minúsculas antes de crear el objeto
         new_entry = Blacklist(
-            email=data['email'],
+            email=data['email'].lower(), 
             app_uuid=data['app_uuid'],
             blocked_reason=data.get('blocked_reason'),
             ip_address=request.remote_addr
@@ -55,6 +45,9 @@ class BlacklistResource(Resource):
             db.session.add(new_entry)
             db.session.commit()
             return {"msg": "Email added to blacklist successfully", "id": new_entry.id}, 201
+        except IntegrityError:
+            db.session.rollback()
+            return {"msg": "Email already exists in blacklist"}, 400 # O 409 Conflict
         except Exception as e:
             db.session.rollback()
-            return {"msg": "Database error", "error": str(e)}, 500
+            return {"msg": str(e)}, 500
