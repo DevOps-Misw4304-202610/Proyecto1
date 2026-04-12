@@ -3,7 +3,6 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
-from flask_jwt_extended.exceptions import JWTExtendedException
 from flask_migrate import Migrate
 from .config import Config
 
@@ -22,10 +21,18 @@ def create_app(config_class=Config):
     ma.init_app(application)
     jwt.init_app(application)
 
-    # Flask Error Handler for all JWT Exceptions - Catch before Flask-RESTful
-    @application.errorhandler(JWTExtendedException)
-    def handle_jwt_error(error):
-        return jsonify({"msg": str(error)}), 401
+    # Flask Error Handlers - catch all exceptions and log them
+    @application.errorhandler(Exception)
+    def handle_all_errors(error):
+        # Log the error for debugging
+        application.logger.error(f"Unhandled exception: {type(error).__name__}: {str(error)}")
+        
+        # Check if it's a NoAuthorizationError by class name
+        if "NoAuthorizationError" in type(error).__name__:
+            return jsonify({"msg": "Missing Authorization Header"}), 401
+        
+        # Default to 500
+        return jsonify({"msg": "Internal server error"}), 500
     
     # 3. Importar modelos antes de inicializar Migrate
     # Esto permite que Alembic (el motor de Migrate) vea las tablas

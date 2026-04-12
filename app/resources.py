@@ -1,19 +1,34 @@
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
+from functools import wraps
 from .models import db, Blacklist
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, verify_jwt_in_request
 from .schemas import BlacklistSchema
 from sqlalchemy.exc import IntegrityError
 
 # Instanciamos el schema para validar entradas
 blacklist_schema = BlacklistSchema()
 
+# Custom decorator that catches JWT errors
+def jwt_required_safe():
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            try:
+                verify_jwt_in_request()
+            except Exception as e:
+                # Catch any JWT exception and return 401
+                return {"msg": "Missing Authorization Header"}, 401
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
 class HealthCheck(Resource):
     def get(self):
         return {"status": "UP"}, 200
 
 class BlacklistResource(Resource):
-    @jwt_required()
+    @jwt_required_safe()
     def get(self, email):
         """Get blacklist status for an email"""
         try:
@@ -29,7 +44,7 @@ class BlacklistResource(Resource):
         except Exception as e:
             return {"msg": f"Error querying blacklist: {str(e)}"}, 500
     
-    @jwt_required()
+    @jwt_required_safe()
     def post(self):
         """Add email to blacklist"""
         data = request.get_json()
