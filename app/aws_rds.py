@@ -1,4 +1,6 @@
 import os
+from urllib.parse import quote_plus
+
 import boto3
 from botocore.exceptions import ClientError
 
@@ -87,3 +89,39 @@ def build_rds_database_uri():
         return database_uri
     except Exception as e:
         raise Exception(f"Failed to build RDS database URI: {e}")
+
+
+def build_rds_password_database_uri():
+    """
+    Build a database URI for standard PostgreSQL RDS password authentication.
+
+    Environment variables required:
+    - RDS_HOSTNAME
+    - RDS_PORT (optional, default 5432)
+    - RDS_USERNAME
+    - RDS_PASSWORD
+    - RDS_DB_NAME
+    """
+    try:
+        rds_hostname = os.getenv('RDS_HOSTNAME')
+        rds_port = os.getenv('RDS_PORT', '5432')
+        rds_username = os.getenv('RDS_USERNAME', 'postgres')
+        rds_password = os.getenv('RDS_PASSWORD')
+        rds_db_name = os.getenv('RDS_DB_NAME', 'postgres')
+
+        if not rds_hostname:
+            raise ValueError("RDS_HOSTNAME environment variable not set")
+        if not rds_password:
+            raise ValueError("RDS_PASSWORD environment variable not set")
+
+        # Encode credentials safely in case they contain reserved URL characters.
+        username_escaped = quote_plus(rds_username)
+        password_escaped = quote_plus(rds_password)
+
+        database_uri = (
+            f"postgresql+psycopg://{username_escaped}:{password_escaped}@"
+            f"{rds_hostname}:{rds_port}/{rds_db_name}?sslmode=require"
+        )
+        return database_uri
+    except Exception as e:
+        raise Exception(f"Failed to build password-based RDS database URI: {e}")

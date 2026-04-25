@@ -106,6 +106,129 @@ python application.py
 
 El servicio estará disponible en `http://localhost:5000`.
 
+## ☁️ Despliegue en AWS Elastic Beanstalk + RDS PostgreSQL
+
+Esta aplicación ya está preparada para correr en Beanstalk con Gunicorn (ver `Procfile`) y conectarse a PostgreSQL en RDS por endpoint/usuario/password.
+
+### 1. Crear la base en RDS (PostgreSQL)
+
+En la consola de AWS crea una instancia RDS PostgreSQL y toma estos datos:
+
+- Endpoint
+- Puerto (normalmente `5432`)
+- Usuario
+- Password
+- Nombre de base de datos
+
+Configura seguridad de red:
+
+- Security Group de RDS: permite entrada en puerto `5432` desde el Security Group de Elastic Beanstalk.
+- Si quieres probar desde tu PC: agrega temporalmente tu IP pública con `/32` al puerto `5432`.
+
+### 2. Crear entorno Elastic Beanstalk (Python)
+
+- Plataforma: Python 3.12.
+- Sube el código del repositorio (zip o integración con branch).
+- Beanstalk usará `Procfile` para iniciar Gunicorn.
+
+### 3. Configurar variables de entorno en Beanstalk
+
+En Configuration > Software > Environment properties:
+
+- `RDS_HOSTNAME=<tu-endpoint-rds>`
+- `RDS_PORT=5432`
+- `RDS_USERNAME=<tu-usuario-rds>`
+- `RDS_PASSWORD=<tu-password-rds>`
+- `RDS_DB_NAME=<tu-base>`
+- `RDS_USE_IAM_AUTH=false`
+- `JWT_SECRET_KEY=<tu-secreto-jwt-largo-y-seguro>`
+- `FLASK_ENV=production`
+
+Importante:
+
+- Si `RDS_HOSTNAME` existe, la app usa RDS automáticamente.
+- El modo por defecto ahora es password.
+- Solo si activas `RDS_USE_IAM_AUTH=true` intentará IAM auth.
+
+### 4. Ejecutar migraciones en la base RDS
+
+Antes de usar la API en Beanstalk, crea tablas:
+
+```bash
+flask db upgrade
+```
+
+Puedes correrlo desde una máquina con conectividad a RDS y con las mismas variables de entorno de producción.
+
+### 5. Verificar despliegue
+
+- Health check: `GET /health` en la URL de Beanstalk.
+- Si responde `{"status":"UP"}`, la app está arriba.
+- Luego prueba `POST /blacklists` con JWT para validar conexión DB real.
+
+## 💻 Probar desde tu computador contra RDS
+
+Si quieres validar conexión antes de desplegar:
+
+1. Copia `.env.example` a `.env`.
+2. En `.env`, comenta `DATABASE_URL` y configura:
+
+```env
+RDS_HOSTNAME=<tu-endpoint-rds>
+RDS_PORT=5432
+RDS_USERNAME=<tu-usuario-rds>
+RDS_PASSWORD=<tu-password-rds>
+RDS_DB_NAME=<tu-base>
+RDS_USE_IAM_AUTH=false
+JWT_SECRET_KEY=<el-mismo-secreto-que-usara-tu-api>
+```
+
+3. Ejecuta migraciones:
+
+```bash
+flask db upgrade
+```
+
+4. Levanta la app local:
+
+```bash
+python application.py
+```
+
+Si `GET /health` responde bien y puedes crear/consultar blacklist con token, la conexión a RDS está correcta.
+
+## 🔐 Cómo generar y usar el token JWT (Postman)
+
+### Generar token
+
+Con la misma `JWT_SECRET_KEY` de tu API, ejecuta:
+
+```bash
+python gen_token.py
+```
+
+El script imprime un valor como:
+
+```text
+Bearer eyJ0eXAiOiJKV1QiLCJhbGciOi...
+```
+
+### Usar token en Postman
+
+Para endpoints protegidos (`/blacklists`):
+
+- Header `Authorization`: pega el valor completo que imprime el script (incluyendo `Bearer `).
+- Header `Content-Type`: `application/json` (en POST).
+
+Ejemplo de headers:
+
+```text
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOi...
+Content-Type: application/json
+```
+
+Si omites el header `Authorization`, la API responderá `401 Missing Authorization Header`.
+
 ## 🧪 Pruebas y Validación
 
 ### 1. Pruebas Unitarias (Pytest)
