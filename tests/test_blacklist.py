@@ -4,8 +4,8 @@ from app.models import Blacklist
 
 def test_health_check(client):
     response = client.get('/health')
-    #assert response.status_code == 200
-    assert response.status_code == 500
+    assert response.status_code == 200
+    #assert response.status_code == 500 #prueba para provocar error 
     assert response.json['status'] == "UP"
 
 @patch('app.resources.db.session')
