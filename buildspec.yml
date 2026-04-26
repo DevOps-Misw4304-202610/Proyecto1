@@ -14,7 +14,8 @@ phases:
       - docker build -t $REPO_URI:$IMAGE_TAG .
       - docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest
       - echo "Running tests inside Docker image..."
-      - docker run --rm --entrypoint python $REPO_URI:$IMAGE_TAG -m pytest -v -s tests/ || exit 1
+      - docker run --rm --entrypoint python $REPO_URI:$IMAGE_TAG -m pytest -v -s tests/
+        on-failure: ABORT
 
   post_build:
     commands:
