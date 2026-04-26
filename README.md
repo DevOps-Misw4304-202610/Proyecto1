@@ -108,7 +108,7 @@ El servicio estará disponible en `http://localhost:5000`.
 
 ## 🐳 Docker y Elastic Beanstalk
 
-La aplicación ahora puede ejecutarse como contenedor Docker y desplegarse en Elastic Beanstalk usando una plataforma Docker de un solo contenedor.
+La aplicación ahora puede ejecutarse como contenedor Docker y desplegarse en Elastic Beanstalk usando una plataforma Docker de un solo contenedor. Para usar la plataforma Docker de EB se tiene que eliminar docker-compose y .ebextensions.
 
 ### Ejecución local con Docker
 
