@@ -1,24 +1,29 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      python: 3.12
-    commands:
-      - pip install -r requirements.txt
-      - pip install pytest pytest-flask  # Para las pruebas
-
   pre_build:
     commands:
-      - echo "Ejecutando pruebas unitarias..."
-      - python -m pytest -v -s tests/
+      - echo "Logging into Amazon ECR..."
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 800445863626.dkr.ecr.us-east-2.amazonaws.com
 
   build:
     commands:
-      - echo "Empaquetando aplicación..."
-      - zip -r blacklist-app.zip . -x "*.git*" "*__pycache__*" "*.pyc" ".env*" "postman/*" "tests/*" "migrations/*"
+      - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - echo "Building the Docker image..."
+      - docker build -t $REPO_URI:$IMAGE_TAG .
+      - docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest
+      - echo "Running tests inside Docker image..."
+      - docker run --rm --entrypoint python $REPO_URI:$IMAGE_TAG -m pytest -v -s tests/
 
+  post_build:
+    commands:
+      - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPO_URI:$IMAGE_TAG
+      - docker push $REPO_URI:latest
 artifacts:
   files:
-    - blacklist-app.zip
-  discard-paths: no
+    - '**/*'
