@@ -106,6 +106,51 @@ python application.py
 
 El servicio estará disponible en `http://localhost:5000`.
 
+## 🐳 Docker y Elastic Beanstalk
+
+La aplicación ahora puede ejecutarse como contenedor Docker y desplegarse en Elastic Beanstalk usando una plataforma Docker de un solo contenedor.
+
+### Ejecución local con Docker
+
+1. Levanta la base de datos y la app:
+
+```bash
+docker compose up --build
+```
+
+2. La app quedará disponible en `http://localhost:8000`.
+3. El contenedor ejecuta automáticamente `flask db upgrade` antes de iniciar Gunicorn, así que necesitas que la base de datos esté accesible desde el contenedor.
+
+### Variables de entorno para Docker/EB
+
+En Elastic Beanstalk configura estas variables en Environment properties:
+
+```env
+RDS_HOSTNAME=<tu-endpoint-rds>
+RDS_PORT=5432
+RDS_USERNAME=<tu-usuario-rds>
+RDS_PASSWORD=<tu-password-rds>
+RDS_DB_NAME=<tu-base>
+RDS_USE_IAM_AUTH=false
+JWT_SECRET_KEY=<tu-secreto-jwt-largo-y-seguro>
+FLASK_ENV=production
+PORT=8000
+```
+
+### Despliegue en Elastic Beanstalk
+
+1. Crea un entorno Elastic Beanstalk con plataforma Docker de un solo contenedor.
+2. Sube el repositorio con el `Dockerfile` en la raíz.
+3. Configura las variables de entorno anteriores.
+4. Asegura conectividad de red hacia RDS desde la instancia de EB.
+5. Despliega y valida `GET /health`.
+
+### Notas sobre migraciones automáticas
+
+- Las migraciones siguen siendo automáticas.
+- Se ejecutan dentro del contenedor en el arranque, antes de Gunicorn.
+- Si RDS no responde a tiempo, el contenedor fallará y Elastic Beanstalk marcará el despliegue como fallido, que es el comportamiento esperado para evitar arrancar con una base inconsistente.
+
 ## ☁️ Despliegue en AWS Elastic Beanstalk + RDS PostgreSQL
 
 Esta aplicación ya está preparada para correr en Beanstalk con Gunicorn (ver `Procfile`) y conectarse a PostgreSQL en RDS por endpoint/usuario/password.
