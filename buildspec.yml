@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging into Amazon ECR..."
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 800445863626.dkr.ecr.us-east-2.amazonaws.com
+
+  build:
+    commands:
+      - set -e
+      - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - echo "Building the Docker image..."
+      - docker build -t $REPO_URI:$IMAGE_TAG .
+      - docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest
+      - echo "Running tests inside Docker image..."
+      - docker run --rm --entrypoint python $REPO_URI:$IMAGE_TAG -m pytest -v -s tests/
+
+  post_build:
+    commands:
+      - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - |
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" != "1" ]; then
+          echo "Build failed earlier. Skipping Docker push."
+          exit 0
+        fi
+        echo "Build completed on $(date)"
+        echo "Pushing the Docker image..."
+        docker push $REPO_URI:$IMAGE_TAG
+        docker push $REPO_URI:latest
+artifacts:
+  files:
+    - '**/*'

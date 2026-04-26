@@ -8,14 +8,20 @@ def _get_database_uri():
     """
     Get database URI based on configuration.
     
-    If RDS_HOSTNAME is set, uses AWS RDS IAM authentication.
+    If RDS_HOSTNAME is set, uses standard RDS password authentication by default.
+    Optionally, set RDS_USE_IAM_AUTH=true to use AWS IAM token authentication.
     Otherwise, falls back to DATABASE_URL environment variable.
     """
-    # Check if using AWS RDS with IAM auth
+    # Check if using AWS RDS
     if os.getenv('RDS_HOSTNAME'):
         try:
-            from .aws_rds import build_rds_database_uri
-            return build_rds_database_uri()
+            from .aws_rds import build_rds_database_uri, build_rds_password_database_uri
+
+            use_iam_auth = os.getenv('RDS_USE_IAM_AUTH', 'false').lower() in ('1', 'true', 'yes')
+            if use_iam_auth:
+                return build_rds_database_uri()
+
+            return build_rds_password_database_uri()
         except Exception as e:
             print(f"Warning: Failed to build RDS URI: {e}. Falling back to DATABASE_URL")
             return os.getenv('DATABASE_URL', 'postgresql+psycopg://user_blacklist:password123@localhost:5433/blacklist_db')
