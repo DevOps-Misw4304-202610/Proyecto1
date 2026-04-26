@@ -21,6 +21,7 @@ phases:
     commands:
       - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
       - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
+      - if [ "$CODEBUILD_BUILD_SUCCEEDING" != "1" ]; then echo "Build failed earlier. Skipping Docker push."; exit 0; fi
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $REPO_URI:$IMAGE_TAG
