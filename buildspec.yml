@@ -8,6 +8,7 @@ phases:
 
   build:
     commands:
+      - set -e
       - REPO_URI=800445863626.dkr.ecr.us-east-2.amazonaws.com/blacklist_repo
       - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}
       - echo "Building the Docker image..."
@@ -15,7 +16,6 @@ phases:
       - docker tag $REPO_URI:$IMAGE_TAG $REPO_URI:latest
       - echo "Running tests inside Docker image..."
       - docker run --rm --entrypoint python $REPO_URI:$IMAGE_TAG -m pytest -v -s tests/
-        on-failure: ABORT
 
   post_build:
     commands:
