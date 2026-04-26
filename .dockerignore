@@ -10,7 +10,6 @@ __pycache__
 .ruff_cache
 .env
 .env.*
-tests
 postman
 migrations/__pycache__
 README.md
