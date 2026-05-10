@@ -2,7 +2,7 @@
 
 Microservicio robusto para la gestión de listas negras de emails, diseñado para ser escalable, seguro y fácil de desplegar.
 
-## 🏗️ Estructura del Proyecto
+## 🏗️ Estructura del Proyecto A
 
 ```Plaintext
 .
