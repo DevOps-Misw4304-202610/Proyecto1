@@ -45,6 +45,6 @@ def create_app(config_class=Config):
     api = Api(application)
     
     api.add_resource(BlacklistResource, '/blacklists', '/blacklists/<email>')
-    api.add_resource(HealthCheck, '/health', '/')
+    api.add_resource(HealthCheck, '/health')
 
     return application
