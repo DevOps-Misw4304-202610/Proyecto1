@@ -30,7 +30,7 @@ phases:
         echo "Pushing the Docker image..."
         docker push $REPO_URI:$IMAGE_TAG
         docker push $REPO_URI:latest
-      - printf '[{"name":"container-v2-entrega-3","imageUri":"${REPO_URI}${IMAGE_TAG}"}]' > imagedefinitions.json
+      - printf '[{"name":"container-v2-entrega-3","imageUri":"%s:%s"}]' "$REPO_URI" "$IMAGE_TAG" > imagedefinitions.json
       - printf '{"ImageURI":"${REPO_URI}${IMAGE_TAG}"}' > imageDetail.json
       - cat imagedefinitions.json
 artifacts:
