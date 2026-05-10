@@ -26,10 +26,6 @@ def jwt_required_safe():
 class HealthCheck(Resource):
     def get(self):
         return {"status": "UP"}, 200
-    
-class ReplacementHealthCheck(Resource):
-    def get(self):
-        return {"status": "UP"}, 200
 
 class BlacklistResource(Resource):
     @jwt_required_safe()

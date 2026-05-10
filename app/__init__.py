@@ -5,7 +5,6 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 
-from app.resources import ReplacementHealthCheck
 from .config import Config
 
 # 1. Instanciamos extensiones (globales pero sin app)
@@ -46,7 +45,6 @@ def create_app(config_class=Config):
     api = Api(application)
     
     api.add_resource(BlacklistResource, '/blacklists', '/blacklists/<email>')
-    api.add_resource(HealthCheck, '/health')
-    api.add_resource(ReplacementHealthCheck, '/')
+    api.add_resource(HealthCheck, '/health', '/')
 
     return application
