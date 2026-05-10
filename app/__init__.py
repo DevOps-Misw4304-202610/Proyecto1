@@ -35,6 +35,11 @@ def create_app(config_class=Config):
         # Default to 500
         return jsonify({"msg": "Internal server error"}), 500
     
+    # Handle 404 gracefully without logging as error
+    @application.errorhandler(404)
+    def handle_not_found(error):
+        return jsonify({"msg": "Not found"}), 404
+    
     # 3. Importar modelos antes de inicializar Migrate
     # Esto permite que Alembic (el motor de Migrate) vea las tablas
     from .models import Blacklist 
@@ -45,6 +50,6 @@ def create_app(config_class=Config):
     api = Api(application)
     
     api.add_resource(BlacklistResource, '/blacklists', '/blacklists/<email>')
-    api.add_resource(HealthCheck, '/health')
+    api.add_resource(HealthCheck, '/', '/health')
 
     return application
