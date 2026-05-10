@@ -1,19 +1,17 @@
-[
-  {
-    "Version": 1,
-    "Resources": [
-      {
-        "TargetService": {
-          "Type": "AWS::ECS::Service",
-          "Properties": {
-            "TaskDefinition": "<TASK_DEFINITION>",
-            "LoadBalancerInfo": {
-              "ContainerName": "container-v2-entrega-3",
-              "ContainerPort": 5000
-            }
+{
+  "version": 1,
+  "Resources": [
+    {
+      "TargetService": {
+        "Type": "AWS::ECS::Service",
+        "Properties": {
+          "TaskDefinition": "<TASK_DEFINITION>",
+          "LoadBalancerInfo": {
+            "ContainerName": "container-v2-entrega-3",
+            "ContainerPort": 5000
           }
         }
       }
-    ]
-  }
-]
+    }
+  ]
+}
