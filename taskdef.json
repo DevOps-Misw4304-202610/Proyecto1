@@ -12,14 +12,6 @@
           "containerPort": 5000
         }
       ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/python-app-final",
-          "awslogs-region": "us-east-2",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
       "environment": [
         {
           "name": "PORT",
