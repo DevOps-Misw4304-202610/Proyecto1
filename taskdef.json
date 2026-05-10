@@ -2,6 +2,9 @@
   "executionRoleArn": "arn:aws:iam::800445863626:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
+      "name": "container-v2-entrega-3",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
       "portMappings": [
         {
           "hostPort": 5000,
@@ -9,9 +12,20 @@
           "containerPort": 5000
         }
       ],
-      "image": "<IMAGE1_NAME>",
-      "essential": true,
-      "name": "container-v2-entrega-3"
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/python-app-final",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "5000"
+        }
+      ]
     }
   ],
   "requiresCompatibilities": [
