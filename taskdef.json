@@ -13,7 +13,22 @@
         }
       ],
       "environment": [
-
+        {
+        "name": "RDS_PORT",
+        "value": "5432"
+        },
+        {
+        "name": "RDS_DB_NAME",
+        "value": "postgres"
+        },
+        {
+        "name": "JWT_SECRET_KEY",
+        "value": "clave-secreta-uniandes-2026"
+        },
+        {
+        "name": "RDS_USERNAME",
+        "value": "postgres"
+        }
       ]
     }
   ],
