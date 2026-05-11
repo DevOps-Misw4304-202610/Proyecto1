@@ -14,6 +14,22 @@
       ],
       "environment": [
         {
+          "name": "PORT",
+          "value": "5000"
+        },
+        {
+          "name": "AWS_REGION",
+            "value": "us-east-2"
+        },
+        {
+        "name": "RDS_HOSTNAME",
+        "value": "database-1.ch88yqe2ckdr.us-east-2.rds.amazonaws.com"
+        },
+        {
+        "name": "RDS_PASSWORD",
+        "value": "password"
+        },
+        {
         "name": "RDS_PORT",
         "value": "5432"
         },
