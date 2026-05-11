@@ -13,38 +13,7 @@
         }
       ],
       "environment": [
-        {
-          "name": "PORT",
-          "value": "5000"
-        },
-        {
-          "name": "AWS_REGION",
-            "value": "us-east-2"
-        },
-        {
-        "name": "RDS_HOSTNAME",
-        "value": "database-1.ch88yqe2ckdr.us-east-2.rds.amazonaws.com"
-        },
-        {
-        "name": "RDS_PASSWORD",
-        "value": "password"
-        },
-        {
-        "name": "RDS_PORT",
-        "value": "5432"
-        },
-        {
-        "name": "RDS_DB_NAME",
-        "value": "postgres"
-        },
-        {
-        "name": "JWT_SECRET_KEY",
-        "value": "clave-secreta-uniandes-2026"
-        },
-        {
-        "name": "RDS_USERNAME",
-        "value": "postgres"
-        }
+
       ]
     }
   ],
