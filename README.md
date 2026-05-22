@@ -72,6 +72,17 @@ cp .env.example .env
 
 ```
 
+1. Actualiza `.env` con tu licencia y nombre de aplicación de New Relic:
+
+```env
+NEW_RELIC_APP_NAME=BlacklistService-Dev
+NEW_RELIC_LICENSE_KEY=<tu_new_relic_license_key>
+NEW_RELIC_LOG_LEVEL=info
+NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
+```
+
+> En desarrollo, la app arranca con New Relic automáticamente si las variables `NEW_RELIC_LICENSE_KEY` y `NEW_RELIC_APP_NAME` están definidas.
+
 ## 📦 Base de Datos y Migraciones
 
 1. **Levantar el contenedor de PostgreSQL:**
@@ -133,6 +144,10 @@ RDS_PASSWORD=<tu-password-rds>
 RDS_DB_NAME=<tu-base>
 RDS_USE_IAM_AUTH=false
 JWT_SECRET_KEY=<tu-secreto-jwt-largo-y-seguro>
+NEW_RELIC_APP_NAME=BlacklistService-Prod
+NEW_RELIC_LICENSE_KEY=<tu_new_relic_license_key>
+NEW_RELIC_LOG_LEVEL=info
+NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
 FLASK_ENV=production
 PORT=8000
 ```
