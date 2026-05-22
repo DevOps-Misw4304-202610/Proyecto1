@@ -58,6 +58,10 @@
         "value": "info"
         },
         {
+        "name": "NEW_RELIC_LOG",
+        "value": "stdout"
+        },
+        {
         "name": "NEW_RELIC_DISTRIBUTED_TRACING_ENABLED",
         "value": "true"
         }
