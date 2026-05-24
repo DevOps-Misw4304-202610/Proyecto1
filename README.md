@@ -78,10 +78,12 @@ cp .env.example .env
 NEW_RELIC_APP_NAME=BlacklistService-Dev
 NEW_RELIC_LICENSE_KEY=<tu_new_relic_license_key>
 NEW_RELIC_LOG_LEVEL=info
+NEW_RELIC_LOG=stdout
 NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true
 ```
 
 > En desarrollo, la app arranca con New Relic automáticamente si las variables `NEW_RELIC_LICENSE_KEY` y `NEW_RELIC_APP_NAME` están definidas.
+> `NEW_RELIC_LOG=stdout` dirige los logs del agente al output estándar, lo cual es útil en contenedores y en AWS Fargate.
 
 ## 📦 Base de Datos y Migraciones
 
