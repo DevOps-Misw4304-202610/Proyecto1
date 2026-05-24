@@ -50,10 +50,6 @@
         "value": "BlacklistService-Prod"
         },
         {
-        "name": "NEW_RELIC_LICENSE_KEY",
-        "value": ""
-        },
-        {
         "name": "NEW_RELIC_LOG_LEVEL",
         "value": "info"
         },
@@ -64,6 +60,12 @@
         {
         "name": "NEW_RELIC_DISTRIBUTED_TRACING_ENABLED",
         "value": "true"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "NEW_RELIC_LICENSE_KEY",
+          "valueFrom": "arn:aws:secretsmanager:us-east-2:800445863626:secret:newrelic/license-enO5qF"
         }
       ]
     }
