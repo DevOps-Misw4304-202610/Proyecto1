@@ -24,4 +24,13 @@ while [ "$attempt" -le "$max_attempts" ]; do
 done
 
 echo "Starting Gunicorn..."
-exec gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${GUNICORN_WORKERS:-4} application:application
+
+GUNICORN_CMD="gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${GUNICORN_WORKERS:-4} application:application"
+
+if [ -n "${NEW_RELIC_LICENSE_KEY:-}" ] && [ -n "${NEW_RELIC_APP_NAME:-}" ]; then
+  echo "New Relic configuration detected. Starting app with New Relic instrumentation..."
+  exec newrelic-admin run-program $GUNICORN_CMD
+else
+  echo "No New Relic license key or app name found. Starting app without New Relic."
+  exec $GUNICORN_CMD
+fi
